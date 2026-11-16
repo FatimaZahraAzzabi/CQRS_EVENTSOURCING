@@ -7,6 +7,8 @@ import net.fz.demoescqrsaxon.commands.commands.DebitAccountCommand;
 import net.fz.demoescqrsaxon.commands.dto.AddNewAccountRequestDTO;
 import net.fz.demoescqrsaxon.commands.dto.CreditAccountRequestDTO;
 import net.fz.demoescqrsaxon.commands.dto.DebitAccountRequestDTO;
+import net.fz.demoescqrsaxon.commands.dto.UpadateAccountStatusRequestDTO;
+import net.fz.demoescqrsaxon.commands.commands.UpadateAccountStatusCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +60,17 @@ public class AccountCommandController {
                 request.accountId(),
                 request.amount(),
                 request.currency()
+
+        ));
+
+        return response;
+    }
+
+    @PutMapping("/updateStatus")
+    public CompletableFuture<String> updateStatus(@RequestBody UpadateAccountStatusRequestDTO request){
+        CompletableFuture<String> response=commandGateway.send(new UpadateAccountStatusCommand(
+                request.accountId(),
+                request.status()
 
         ));
 

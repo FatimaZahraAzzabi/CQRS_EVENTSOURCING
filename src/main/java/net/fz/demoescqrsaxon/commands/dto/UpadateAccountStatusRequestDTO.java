@@ -1,4 +1,7 @@
 package net.fz.demoescqrsaxon.commands.dto;
 
-public class UpadateAccountStatusRequestDTO {
+import net.fz.demoescqrsaxon.enums.AccountStatus;
+
+public record UpadateAccountStatusRequestDTO (
+        String accountId, AccountStatus status){
 }

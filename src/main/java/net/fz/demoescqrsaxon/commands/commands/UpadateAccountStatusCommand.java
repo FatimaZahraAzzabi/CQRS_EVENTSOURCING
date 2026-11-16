@@ -1,7 +1,8 @@
-package net.fz.demoescqrsaxon.events;
+package net.fz.demoescqrsaxon.commands.commands;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.fz.demoescqrsaxon.enums.AccountStatus;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @Getter
@@ -9,7 +10,5 @@ import org.axonframework.modelling.command.TargetAggregateIdentifier;
 public class UpadateAccountStatusCommand {
     @TargetAggregateIdentifier
     private String accountId;
-    private double amount;
-
-    private String currency;
+    private AccountStatus status;
 }

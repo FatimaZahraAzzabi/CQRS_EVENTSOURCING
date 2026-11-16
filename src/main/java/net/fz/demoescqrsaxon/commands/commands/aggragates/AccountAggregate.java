@@ -4,11 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.fz.demoescqrsaxon.commands.commands.AddAccountCommand;
 import net.fz.demoescqrsaxon.commands.commands.CreditAccountCommand;
 import net.fz.demoescqrsaxon.commands.commands.DebitAccountCommand;
+import net.fz.demoescqrsaxon.commands.commands.UpadateAccountStatusCommand;
 import net.fz.demoescqrsaxon.enums.AccountStatus;
-import net.fz.demoescqrsaxon.events.AccountActivatedEvent;
-import net.fz.demoescqrsaxon.events.AccountCreatedEvent;
-import net.fz.demoescqrsaxon.events.AccountCreditEvent;
-import net.fz.demoescqrsaxon.events.AccountDebitEvent;
+import net.fz.demoescqrsaxon.events.*;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -90,6 +88,22 @@ public class AccountAggregate {
         ));
     }
 
+    @CommandHandler
+    public void handle(UpadateAccountStatusCommand command) {
+        log.info("################ UpdateAccountStatusCommand Received ################");
+
+        // Vérification si le statut est déjà le même
+        if (command.getStatus() == this.status) {
+            throw new RuntimeException("This account " + command.getAccountId() + " already has this status");
+        }
+
+        // Application de l'événement
+        AggregateLifecycle.apply(new AccountStatusUpdateEvent(
+                command.getAccountId(),
+                command.getStatus()
+        ));
+    }
+
     @EventSourcingHandler
     public void on(AccountDebitEvent event){
         log.info("le traitemnt de cmd ");
@@ -118,6 +132,13 @@ public class AccountAggregate {
     @EventSourcingHandler
     public void on(AccountActivatedEvent event) {
         log.info("################ AccountCreditedEvent occurred ################");
+        this.accountId = event.getAccountId();
+        this.status = event.getStatus();
+    }
+
+    @EventSourcingHandler
+    public void on(AccountStatusUpdateEvent event) {
+        log.info("############ AccountStatusUpdatedEvent occurred ############");
         this.accountId = event.getAccountId();
         this.status = event.getStatus();
     }
