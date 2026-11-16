@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.fz.demoescqrsaxon.commands.commands.AddAccountCommand;
 import net.fz.demoescqrsaxon.commands.commands.CreditAccountCommand;
 import net.fz.demoescqrsaxon.enums.AccountStatus;
+import net.fz.demoescqrsaxon.events.AccountActivatedEvent;
 import net.fz.demoescqrsaxon.events.AccountCreatedEvent;
 import net.fz.demoescqrsaxon.events.AccountCreditEvent;
 import org.axonframework.commandhandling.CommandHandler;
@@ -15,6 +16,7 @@ import org.axonframework.spring.stereotype.Aggregate;
 @Aggregate
 @Slf4j
 public class AccountAggregate {
+
     @AggregateIdentifier
     private String accountId;
     private double balance;
@@ -36,6 +38,13 @@ public class AccountAggregate {
                 AccountStatus.CREATED,
                 command.getCurrency()
         ));
+
+        AggregateLifecycle.apply(new AccountActivatedEvent(
+                command.getId(),
+                AccountStatus.ACTIVATED
+        ));
+
+
 
 
     }
@@ -74,5 +83,14 @@ public class AccountAggregate {
         this.accountId = event.getAccountId();
         this.balance = this.balance + event.getAmount();
     }
+
+    @EventSourcingHandler
+    public void on(AccountActivatedEvent event) {
+        log.info("################ AccountCreditedEvent occurred ################");
+        this.accountId = event.getAccountId();
+        this.status = event.getStatus();
+    }
+
+
 
 }
