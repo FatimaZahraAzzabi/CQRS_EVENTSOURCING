@@ -72,5 +72,23 @@ public class AccountEventHandler {
         accountRepository.save(account);
     }
 
+    @EventHandler
+    public void on(AccountCreditEvent event, EventMessage eventMessage) {
+        Account account = accountRepository.findById(event.getAccountId()).get();
+
+        AccountOperation accountOperation = AccountOperation.builder()
+                .amount(event.getAmount())
+                .date(eventMessage.getTimestamp())
+                .type(OperationType.CREDIT)
+                .currency(event.getCurrency())
+                .account(account)
+                .build();
+
+        operationRepository.save(accountOperation);
+
+        account.setBalance(account.getBalance() + accountOperation.getAmount());
+        accountRepository.save(account);
+    }
+
 
 }
